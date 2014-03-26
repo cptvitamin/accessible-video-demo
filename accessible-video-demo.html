@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="generator" content=
+    "HTML Tidy for HTML5 (experimental) for Mac OS X https://github.com/w3c/tidy-html5/tree/c63cc39">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+      Accessible Video Example
+    </title>
+    <link rel="author" title="Mark Sadecki" href="mark@w3.org">
+    <link rel="stylesheet" title="base CSS" href=
+    "http://www.w3.org/StyleSheets/TR/base.css">
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv-printshiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <h1>
+      Accessible Video Example
+    </h1>
+    <video id="video" preload="auto" controls="controls" width="640"
+      height="360" poster="http://w3.org/2014/03/HorribleHistories.jpg">
+      <source src="http://w3.org/2014/03/HorribleHistories.mp4" type="video/mp4">
+      <source src="http://w3.org/2014/03/HorribleHistories.webm" type="video/webm">
+      <track kind="captions" label="English captions" src="captions_en.vtt"
+      srclang="en" default="">
+    </video>
+    <audio id="audio" preload="auto">
+      <source src="http://w3.org/2014/03/HorribleHistories.mp3" type="audio/mp3">
+      <source src="http://w3.org/2014/03/HorribleHistories.ogg" type="audio/ogg">
+    </audio>
+
+    <script type="text/javascript">
+
+    (function()
+        {
+
+        //get references to the video and audio elements
+        var video = document.getElementById('video');
+        var audio = document.getElementById('audio');
+
+
+        //if media controllers are supported,
+        //create a controller instance for the video and audio
+        if(typeof(window.MediaController) === 'function')
+        {
+          var controller = new MediaController();
+          audio.controller = controller;
+          video.controller = controller;
+        }
+
+        //else create a null controller reference for comparison
+        else
+        {
+          controller = null;
+        }
+
+        //reduce the video volume slightly to emphasise the audio
+        audio.volume = 1;
+        video.volume = 0.8;
+
+
+        //when the video plays
+        video.addEventListener('play', function()
+        {
+          //if we have audio but no controller
+          //and the audio is paused, play that too
+          if(!controller && audio.paused)
+          {
+            audio.play();
+          }
+        }, false);
+
+        //when the video pauses
+        video.addEventListener('pause', function()
+        {
+          //if we have audio but no controller
+          //and the audio isn't paused, pause that too
+          if(!controller && !audio.paused)
+          {
+            audio.pause();
+          }
+        }, false);
+
+        //when the video ends
+        video.addEventListener('ended', function()
+        {
+          //if we have a controller, pause that
+          if(controller)
+          {
+            controller.pause();
+          }
+          //otherwise pause the video and audio separately
+          else
+          {
+            video.pause();
+            audio.pause();
+          }
+        }, false);
+
+
+        //when the video time is updated
+        video.addEventListener('timeupdate', function()
+        {
+          //if we have audio but no controller,
+          //and the audio has sufficiently loaded
+          if(!controller && audio.readyState >= 4)
+          {
+            //if the audio and video times are different,
+            //update the audio time to keep it in sync
+            if(Math.ceil(audio.currentTime) != Math.ceil(video.currentTime))
+            {
+              audio.currentTime = video.currentTime;
+            }
+          }
+        }, false);
+
+        })();
+    </script>
+  </body>
+</html>
